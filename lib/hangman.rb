@@ -2,7 +2,7 @@ require 'json'
 
 
 #name of text file used for dictionary
-text_file = "5desk.txt"
+text_file = "words.txt"
 
 
 class Hangman
@@ -17,7 +17,10 @@ class Hangman
         puts "### Welcome to Hangman! ###"
         puts "---------------------------\n"
         puts "Load saved game? y/n"
-        load_game() if gets.chomp == 'y'
+        if gets.chomp == 'y'
+            load_game(gets.chomp)
+            puts "loading game..."
+        end
         puts @display_word
     end
 
@@ -56,7 +59,7 @@ class Hangman
             get_input()
         end
 
-            @guessed_letters << @current_input
+        @guessed_letters << @current_input
 
         puts display_word()
 
@@ -83,13 +86,29 @@ class Hangman
     end
 
     def save_game()
+        save = JSON.dump({
+            :chances_left    => @chances_left,
+            :guessed_letters => @guessed_letters,
+            :target_word     => @target_word,
+            :display_word    => @display_word,
+            :current_input   => @current_input
+        })
+        puts "\"enter file_name\".json"
+        save_file = gets.chomp
+        File.open(save_file,"w"){|file| file.puts save}
         puts "~ game saved! ~"
-        #code for saving game. gotta serialize.
     end
 
-    def load_game()
+    def load_game(save_file)
+        data = JSON.load File.read(save_file)
+        @chances_left = data["chances_left"]
+        @guessed_letters = data["guessed_letters"]
+        @target_word = data["target_word"]
+        @display_word = data["display_word"]
+        @current_input = data["current_input"]
         puts "~ game loaded! ~"
         #code for loading game. gotta unserialize.
+        
     end
 
 
