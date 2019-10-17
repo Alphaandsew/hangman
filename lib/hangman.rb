@@ -2,7 +2,7 @@
 
 
 #name of text file used for dictionary
-text_file = "5desk.txt"
+text_file = "words.txt"
 
 
 class Hangman
