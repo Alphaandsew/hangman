@@ -1,50 +1,81 @@
-##Simple Hangman Game. 
 
-#create array for words
-word_list = []
-guessed_letters = []
-text_file = "words.txt"
 
-#read dictionary file and add words to array
-File.readlines(text_file).map{|line| line[0..-2]}.each do |word|
-    word_list << word if word.length <=15 && word.length >=4
-end
 
-target_word = word_list.sample.downcase
-misses_left = 6
+#name of text file used for dictionary
+text_file = "5desk.txt"
 
-#define method for displaying #incorrect guesses
-def draw_misses(num)
+
+class Hangman
+    attr_accessor :target_word
+    def initialize(txt)
+        @chances_left = 6 
+        @guessed_letters = []
+        @word_list = create_word_list(txt)
+        @target_word = @word_list.sample.downcase
+        @display_word = display_word()
+        @current_input = "@"
+        puts "### Welcome to Hangman! ###"
+        puts "---------------------------\n"
+        puts @display_word
+    end
+
     
-    output ="Guesses: "+ ("[X]"*(6-num))+("[_]"*num)
+    def create_word_list(text_file)
+        list = []
+        File.readlines(text_file).map{|line| line[0..-2]}.each do |word|
+        list << word if word.length <=12 && word.length >=5
+        end
+        list
+    end
+
     
-end
 
-puts misses_left
+    def draw_chances(num)
+        output = ("[X]"*(6-num))+("[_]"*num)
+    end
 
-until misses_left <= 0 do 
-    puts
-    puts "enter a guess:"
-    input = gets.downcase.chomp[0]
-    puts
-    guessed_letters << input
-    display_word = ""
-    target_word.chars.each do |ch|
-        if guessed_letters.include? ch 
-            display_word += ch
-            wrong = false
+    def game_over(word,input)
+        return "You Win!" if !word.include? "_"
+        @chances_left -= 1 if !target_word.include? input
+
+        if @chances_left <= 0
+            "you lost. The word was: #{@target_word}"
         else
-            display_word += "_"
+            puts draw_chances(@chances_left)
+            puts "\nEnter a guess:"
+            play()
         end
     end
-    puts display_word
-    break if !display_word.include? "_"
-    misses_left -= 1 if !target_word.include? input 
-    puts draw_misses(misses_left)
+
+    def play()
+
+        @guessed_letters << get_input()
+            
+        puts display_word()
+
+        puts game_over(@display_word,@current_input)
+            
+    end
+
+    def display_word
+        @display_word = @target_word.chars.map do |ch|
+            if @guessed_letters.include? ch 
+                ch 
+            else
+                "_"
+            end
+        end
+        @display_word = @display_word.join("")
+        @display_word
+    end
+
+    def get_input()
+        @current_input = gets.to_s.downcase.chomp[0] 
+        # puts "debug @current_input: #{@current_input}"
+        @current_input
+    end
+
 end
 
-if misses_left <= 0
-    puts "you lost. The word was: #{target_word}"
-else
-    puts "you win!"
-end
+game = Hangman.new(text_file)
+game.play()
