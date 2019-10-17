@@ -1,13 +1,13 @@
-
+require 'json'
 
 
 #name of text file used for dictionary
-text_file = "words.txt"
+text_file = "5desk.txt"
 
 
 class Hangman
     attr_accessor :target_word
-    def initialize(txt)
+    def initialize(txt = text_file)
         @chances_left = 6 
         @guessed_letters = []
         @word_list = create_word_list(txt)
@@ -16,6 +16,8 @@ class Hangman
         @current_input = "@"
         puts "### Welcome to Hangman! ###"
         puts "---------------------------\n"
+        puts "Load saved game? y/n"
+        load_game() if gets.chomp == 'y'
         puts @display_word
     end
 
@@ -42,15 +44,20 @@ class Hangman
             "you lost. The word was: #{@target_word}"
         else
             puts draw_chances(@chances_left)
-            puts "\nEnter a guess:"
+            puts "\nEnter a guess (or enter 5 to save game):"
             play()
         end
     end
 
     def play()
+        if get_input() == '5'
+            save_game()
+            puts "Enter a guess: "
+            get_input()
+        end
 
-        @guessed_letters << get_input()
-            
+            @guessed_letters << @current_input
+
         puts display_word()
 
         puts game_over(@display_word,@current_input)
@@ -75,7 +82,21 @@ class Hangman
         @current_input
     end
 
+    def save_game()
+        puts "~ game saved! ~"
+        #code for saving game. gotta serialize.
+    end
+
+    def load_game()
+        puts "~ game loaded! ~"
+        #code for loading game. gotta unserialize.
+    end
+
+
+
 end
 
-game = Hangman.new(text_file)
+    game = Hangman.new(text_file)
+
+
 game.play()
